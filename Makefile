@@ -25,8 +25,8 @@ ship.o: $(SHIP)ship.cpp $(SHIP)ship.h sprite.o proj.o
 	g++ -c $(SHIP)ship.cpp sprite.o proj.o -o ship.o $(FLAGS)
 
 
-creep.o: $(CREEP)creep.cpp $(CREEP)creep.h sprite.o
-	g++ -c $(CREEP)creep.cpp sprite.o -o creep.o $(FLAGS)
+creep.o: $(CREEP)creep.cpp $(CREEP)creep.h sprite.o proj.o
+	g++ -c $(CREEP)creep.cpp sprite.o proj.o -o creep.o $(FLAGS)
 
 
 final: final.cpp ship.o creep.o proj.o

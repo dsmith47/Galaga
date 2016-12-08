@@ -19,7 +19,7 @@ Ship::~Ship(){}
 Projectile Ship::fireProjectile(){
   int x = this->getXpos();
   int y = this->getYpos();
-  Projectile p(x,(y-30),3,6);
+  Projectile p(x,(y-30),3,6,true);
   return p;
 }
 // draws the image

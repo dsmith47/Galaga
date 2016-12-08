@@ -3,6 +3,7 @@
 #include "../../../gfxnew.h"
 
 #include "../sprite.h"
+#include "../projectiles/projectile.h"
 
 #include "creep.h"
 
@@ -18,6 +19,13 @@ Creep::Creep(int x, int y, int w, int h, std::string t) : Sprite(x,y,w,h) {
 Creep::~Creep(){}
 
 //UTILITY
+//Creates a projectile object
+Projectile Creep::fireProjectile(){
+  int x = this->getXpos();
+  int y = this->getYpos();
+  Projectile p(x,(y+30),3,6,false);
+  return p;
+}
 // draws the appropriate enemy by types
 void Creep::draw(){
   if ( type == "butterfly" ){

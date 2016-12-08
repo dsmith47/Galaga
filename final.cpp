@@ -31,8 +31,9 @@ using namespace std;
 int loadHighscore( string );
 void saveHighScore( int, string );
 
-void drawBoard(int,int,int,Ship&, vector<Creep>&, vector<Projectile>&);
+void drawBoard(int,int,int,Ship&, vector<Creep>&, vector<Projectile>&, vector<Projectile>&);
 void checkCollisions(vector<Projectile>&,vector<Creep>&);
+void checkDeath(vector<Projectile>&, Ship&);
 
 void hail( vector<Projectile>& );
 
@@ -47,55 +48,71 @@ int main(){
 
   Ship player(xMax/2,yMax-20,40,20);
   vector<Creep> enemies;
-  vector<Projectile> projs;
+  vector<Projectile> playerProjs, enemyProjs;
   int fireLag =0;
   bool fireReady = false;
+  int creepWait=0;
 
   Creep bug(100,100, 20,20,"butterfly");
   enemies.insert(enemies.end(),bug);
   gfx_open(xMax,yMax,"GALAGA");
 
-  drawBoard(lives,score,highscore,player,enemies,projs);
+  drawBoard(lives,score,highscore,player,enemies,playerProjs,enemyProjs);
 
   while(1){
-    usleep(10000);
+    usleep(20000);
     if( gfx_event_waiting() ){
       in=gfx_wait();
       if( in=='Q' ){
         player.move(-1,0);
       } else if( in=='S' ){
         player.move(1,0);
-
       } else if(in==' '){
         if(fireReady){
           fireReady=false;
           fireLag = 0;
-          projs.insert( projs.end(), player.fireProjectile() );
+          playerProjs.insert( playerProjs.end(), player.fireProjectile() );
         }
       } else if(in=='h'){
         cout << "HAIL\n";
-        hail(projs);
+        hail(playerProjs);
       }
     }
+    //Timer between player shots
     if(!fireReady){
       fireLag++;
       if(fireLag>=30){
         fireReady = true;
       }
     }
+    //timer to check random creep firing
+    if( creepWait > 10){
+      creepWait = 0;
+      enemyProjs.insert(enemyProjs.end(), enemies[0].fireProjectile());
+    } else {
+      ++creepWait;
+    }
     //move all projectiles
-    for( int i=0; i<(int)projs.size(); ++i ){
-      if( projs[i].getYpos() < 40 ){
-        projs.erase( projs.begin()+i );
+    for( int i=0; i<(int)playerProjs.size(); ++i ){
+      if( playerProjs[i].getYpos() < 40 ){
+        playerProjs.erase( playerProjs.begin()+i );
         --i;
       } else {
-        projs[i].move(0,-1);
+        playerProjs[i].move(0,-1);
       }
     }
-    //Check collisions with player and all enemies
-    checkCollisions( projs,enemies );
-
-    drawBoard(lives,score,highscore,player,enemies,projs);
+    for( int i=0; i<(int)enemyProjs.size(); ++i ){
+      if( enemyProjs[i].getYpos() > yMax ){
+        enemyProjs.erase( enemyProjs.begin()+i );
+        --i;
+      } else {
+        enemyProjs[i].move(0,1);
+      }
+    }
+    //Check collisions with projectiles for player and all enemies
+    checkCollisions( playerProjs,enemies );
+    checkDeath( enemyProjs, player );
+    drawBoard(lives,score,highscore,player,enemies,playerProjs,enemyProjs);
 
   }
 
@@ -105,7 +122,7 @@ return 0;
 }
 
 //Functrion to draw the board anew
-void drawBoard(int lives,int score,int high,Ship& s, vector<Creep>& c, vector<Projectile>& p){
+void drawBoard(int lives,int score,int high,Ship& s, vector<Creep>& c, vector<Projectile>& p1, vector<Projectile>& p2){
   //Strings that will be used to display statuses
   gfx_color(255,255,255);
   string liv;
@@ -125,7 +142,10 @@ void drawBoard(int lives,int score,int high,Ship& s, vector<Creep>& c, vector<Pr
   for( auto & it : c ){
     it.draw();
   }
-  for( auto & it : p ){
+  for( auto & it : p1 ){
+    it.draw();
+  }
+  for( auto & it : p2 ){
     it.draw();
   }
 }
@@ -135,7 +155,7 @@ void checkCollisions(vector<Projectile>& p,vector<Creep>& c){
   //check each projectile against each creep
   for( int i=0; i<(int)p.size(); ++i ){
     for( int j=0; j<(int)c.size(); ++j ){
-      if( ( p[i].getXpos()<c[i].getXpos()+c[i].getWidth()/2 )&&( p[i].getXpos()>c[i].getXpos()-c[i].getWidth()/2 )&&( p[i].getYpos()<c[i].getYpos()+c[i].getHeight()/2 )&&( p[i].getYpos()>c[i].getYpos()-c[i].getHeight()/2 ) ){
+      if( ( p[i].getXpos()<c[j].getXpos()+c[j].getWidth()/2 )&&( p[i].getXpos()>c[j].getXpos()-c[j].getWidth()/2 )&&( p[i].getYpos()<c[j].getYpos()+c[j].getHeight()/2 )&&( p[i].getYpos()>c[j].getYpos()-c[j].getHeight()/2 ) ){
         p.erase( p.begin()+i );
         c.erase( c.begin()+j );
         --i;
@@ -144,6 +164,15 @@ void checkCollisions(vector<Projectile>& p,vector<Creep>& c){
     }
   }
 
+}
+
+void checkDeath(vector<Projectile>& c, Ship& p){
+  for( int i=0; i<(int)c.size(); ++i ){
+    if( ( c[i].getXpos()<p.getXpos()+p.getWidth()/2 )&&( c[i].getXpos()>p.getXpos()-p.getWidth()/2 )&&( c[i].getYpos()<p.getYpos()+p.getHeight()/2 )&&( c[i].getYpos()>p.getYpos()-p.getHeight()/2 ) ){
+      c.erase( c.begin()+i );
+      --i;
+    }
+  }
 }
 
 
@@ -172,19 +201,23 @@ void saveHighScore( int score, string fname ){
   fs.close();
 }
 
-
+//RN-Gesus
+//Returns a random number between MIN and MAX
+int random(int min, int max){
+  return ( std::rand() % (max-min+1) ) + min;
+}
 
 
 
 //EASTER EGGS///////////////////////////////////////////////////////////////////
 //Releases a long line of projectile
 Projectile createProjectile(int a){
-  Projectile proj(a,yMax-40,3,6);
+  Projectile proj(a,yMax-40,3,6,true);
   return proj;
 }
 
 void hail( vector<Projectile>& p ){
-  Projectile proj(0,0,3,6);
+  Projectile proj(0,0,3,6,true);
   for(int i=5;i<xMax;i+=5){
     proj.setXpos(i);
     p.insert(p.end(),createProjectile(i) );
