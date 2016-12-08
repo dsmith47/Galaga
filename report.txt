@@ -1,0 +1,17 @@
+FINAL CODING PROJECT
+PAC-MAN CLONE
+
+Douglas J. Smith
+
+Building:
+    Compile to executable with:
+        make final
+        make pacman
+
+Gameplay:
+
+
+Codebase:
+
+
+Easter Eggs:
