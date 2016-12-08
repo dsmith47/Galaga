@@ -4,6 +4,7 @@
 #define SHIP_H
 
 #include "../sprite.h"
+#include "../projectiles/projectile.h"
 
 class Ship : public Sprite{
 public:
@@ -11,7 +12,7 @@ public:
   Ship(int,int,int,int);
   ~Ship();
   void draw();
-  void fireProjectile();
+  Projectile fireProjectile();
 private:
 
 };

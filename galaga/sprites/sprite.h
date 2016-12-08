@@ -15,6 +15,12 @@ public:
   int getYpos();
   void setYpos(int);
 
+  int getWidth();
+  void setWidth(int);
+
+  int getHeight();
+  void setHeight(int);
+
   void setColor(int, int, int);
 
   void move(int, int);

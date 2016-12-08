@@ -5,6 +5,7 @@
 
 #include "../sprite.h"
 #include "../sprite.cpp"
+#include "../projectiles/projectile.h"
 #include "ship.h"
 
 //CONSTRUCTOR
@@ -15,7 +16,12 @@ Ship::~Ship(){}
 
 //UTILITY
 //Creates a projectile object that travels up the screen to impact a creep
-
+Projectile Ship::fireProjectile(){
+  int x = this->getXpos();
+  int y = this->getYpos();
+  Projectile p(x,(y-30),3,6);
+  return p;
+}
 // draws the image
 void Ship::draw(){
   int x = this->getXpos();

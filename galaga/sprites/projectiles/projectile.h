@@ -1,7 +1,7 @@
 // creep.h
 
-#ifndef CREEP_H
-#define CREEP_H
+#ifndef PROJECTILE_H
+#define PROJECTILE_H
 
 #include "../sprite.h"
 #include "projectile.h"

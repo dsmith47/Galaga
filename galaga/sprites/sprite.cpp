@@ -32,6 +32,22 @@ int Sprite::getYpos(){
 void Sprite::setYpos(int y){
   ypos = y;
 }
+//returns width position
+int Sprite::getWidth(){
+  return width;
+}
+//Changes width position
+void Sprite::setWidth(int w){
+  width = w;
+}
+//returns height position
+int Sprite::getHeight(){
+  return height;
+}
+//Changes height position
+void Sprite::setHeight(int h){
+  height = h;
+}
 
 void Sprite::setColor(int r, int g, int b){
   color[0] = r;

@@ -16,11 +16,18 @@ Projectile::~Projectile(){}
 //UTILITY
 // draws the appropriate enemy by types
 void Projectile::draw(){
+  int x = this->getXpos();
+  int y = this->getYpos();
   XPoint points[] = {
-
+    {x-1,y-7},{x-1,y-3},{x-3,y-3},
+    {x-3,y+1},{x-1,y+1},
+    {x-1,y+7},{x+1,y+7},
+    {x+1,y+1},{x+3,y+1},
+    {x+3,y-3},{x+1,y-3},
+    (x+1,y-7)
   };
 
-  gfx_color(255,0,0);
-  gfx_fill_polygon(points,40);
+  gfx_color(0,0,255);
+  gfx_fill_polygon(points,11);
   gfx_flush();
 }
