@@ -23,7 +23,7 @@ Creep::~Creep(){}
 Projectile Creep::fireProjectile(){
   int x = this->getXpos();
   int y = this->getYpos();
-  Projectile p(x,(y+30),3,6,false);
+  Projectile p(x+(2*this->getWidth()/3),(y+30),3,6,false);
   return p;
 }
 // draws the appropriate enemy by types

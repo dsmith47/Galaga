@@ -33,9 +33,13 @@ void saveHighScore( int, string );
 
 void drawBoard(int,int,int,Ship&, vector<Creep>&, vector<Projectile>&, vector<Projectile>&);
 void checkCollisions(vector<Projectile>&,vector<Creep>&);
-void checkDeath(vector<Projectile>&, Ship&);
+bool checkDeath(vector<Projectile>&, Ship&);
+
+Projectile createProjectile(int);
+Creep createCreep(int,int,int,int, string);
 
 void hail( vector<Projectile>& );
+int random( int,int );
 
 const int xMax=600;
 const int yMax=600;
@@ -53,8 +57,11 @@ int main(){
   bool fireReady = false;
   int creepWait=0;
 
-  Creep bug(100,100, 20,20,"butterfly");
-  enemies.insert(enemies.end(),bug);
+  Creep bug = createCreep(0,100, 20,20,"butterfly");
+  for(int i=60; i<xMax-60; i+=60){
+    bug = createCreep(i,100, 20,20,"butterfly");
+    enemies.insert(enemies.end(),bug);
+  }
   gfx_open(xMax,yMax,"GALAGA");
 
   drawBoard(lives,score,highscore,player,enemies,playerProjs,enemyProjs);
@@ -86,9 +93,11 @@ int main(){
       }
     }
     //timer to check random creep firing
-    if( creepWait > 10){
+    if( creepWait > 250){
+      creepWait = random( 0,enemies.size() );
+      cout << "CREEP: " << creepWait << "\n";
+      enemyProjs.insert(enemyProjs.end(), enemies[creepWait].fireProjectile());
       creepWait = 0;
-      enemyProjs.insert(enemyProjs.end(), enemies[0].fireProjectile());
     } else {
       ++creepWait;
     }
@@ -102,7 +111,7 @@ int main(){
       }
     }
     for( int i=0; i<(int)enemyProjs.size(); ++i ){
-      if( enemyProjs[i].getYpos() > yMax ){
+      if( enemyProjs[i].getYpos() > yMax-30 ){
         enemyProjs.erase( enemyProjs.begin()+i );
         --i;
       } else {
@@ -111,7 +120,18 @@ int main(){
     }
     //Check collisions with projectiles for player and all enemies
     checkCollisions( playerProjs,enemies );
-    checkDeath( enemyProjs, player );
+    if( checkDeath( enemyProjs, player ) ) {
+      cout << "PLAYER DEATH\n";
+      lives -= 1;
+      if( lives < 0 ){
+        break;
+      }
+      player.setXpos( xMax / 2 );
+    }
+    //END THE GAME IF THERE ARE NO CREEP LEFT
+    if( enemies.size() <= 0 ){
+      break;
+    }
     drawBoard(lives,score,highscore,player,enemies,playerProjs,enemyProjs);
 
   }
@@ -166,13 +186,13 @@ void checkCollisions(vector<Projectile>& p,vector<Creep>& c){
 
 }
 
-void checkDeath(vector<Projectile>& c, Ship& p){
+bool checkDeath(vector<Projectile>& c, Ship& p){
   for( int i=0; i<(int)c.size(); ++i ){
     if( ( c[i].getXpos()<p.getXpos()+p.getWidth()/2 )&&( c[i].getXpos()>p.getXpos()-p.getWidth()/2 )&&( c[i].getYpos()<p.getYpos()+p.getHeight()/2 )&&( c[i].getYpos()>p.getYpos()-p.getHeight()/2 ) ){
-      c.erase( c.begin()+i );
-      --i;
+      return true;
     }
   }
+  return false;
 }
 
 
@@ -204,21 +224,28 @@ void saveHighScore( int score, string fname ){
 //RN-Gesus
 //Returns a random number between MIN and MAX
 int random(int min, int max){
-  return ( std::rand() % (max-min+1) ) + min;
+  cout << "MAX: " << max << "\nMIN: "<< min <<"\n";
+  int ran = ( std::rand() % (max-min+1) ) + min;
+  cout << "RAND: " << ran << "\n";
+  return ran;
 }
 
-
-
-//EASTER EGGS///////////////////////////////////////////////////////////////////
+//Creates a creep
+Creep createCreep(int x, int y, int w, int h, string t){
+  Creep c(x,y,w,h,t);
+  return c;
+}
 //Releases a long line of projectile
 Projectile createProjectile(int a){
   Projectile proj(a,yMax-40,3,6,true);
   return proj;
 }
+//EASTER EGGS///////////////////////////////////////////////////////////////////
+
 
 void hail( vector<Projectile>& p ){
   Projectile proj(0,0,3,6,true);
-  for(int i=5;i<xMax;i+=5){
+  for(int i=5;i<xMax;i+=15){
     proj.setXpos(i);
     p.insert(p.end(),createProjectile(i) );
   }
