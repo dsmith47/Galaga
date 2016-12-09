@@ -32,7 +32,7 @@ int loadHighscore( string );
 void saveHighScore( int, string );
 
 void drawBoard(int,int,int,Ship&, vector<Creep>&, vector<Projectile>&, vector<Projectile>&);
-void checkCollisions(vector<Projectile>&,vector<Creep>&);
+int checkCollisions(vector<Projectile>&,vector<Creep>&);
 bool checkDeath(vector<Projectile>&, Ship&);
 
 Projectile createProjectile(int);
@@ -56,8 +56,8 @@ int main(){
   int fireLag =0;
   bool fireReady = false;
   int creepWait=0;
-  int formV = 0; //Velocity of moving formation
-  int formA = 0; //acceleration (direction) for form movement
+  int formD = 0; //Displacement of moving formation
+  int formV = 1; //velocity (direction) for form movement
 
   Creep bug = createCreep(0,100, 20,20,"butterfly");
   for(int i=60; i<xMax-60; i+=60){
@@ -85,7 +85,6 @@ int main(){
           playerProjs.insert( playerProjs.end(), player.fireProjectile() );
         }
       } else if(in=='h'){
-        cout << "HAIL\n";
         hail(playerProjs);
       }
     }
@@ -96,10 +95,17 @@ int main(){
         fireReady = true;
       }
     }
-    //Creep formation should spread and compress from current positions (see OG game)
-    if( formX < 3 )
-    ++formX;
-    ++formY;
+    //Creep formation should shiftand from current positions (see OG game)
+    if( formD<40 && formD>-40 ){
+      for( auto & it : enemies ){
+        formD += formV;
+        it.move(formV,formV);
+      }
+    } else {
+      formV *= -1;
+      formD += formV;
+      formD = 0;
+    }
 
     //timer to check random creep firing
     if( creepWait > 250){
@@ -127,9 +133,11 @@ int main(){
       }
     }
     //Check collisions with projectiles for player and all enemies
-    checkCollisions( playerProjs,enemies );
+    score +=  100*checkCollisions( playerProjs,enemies );
+    if( score>highscore ){
+      highscore = score;
+    }
     if( checkDeath( enemyProjs, player ) ) {
-      cout << "PLAYER DEATH\n";
       lives -= 1;
       if( lives < 0 ){
         break;
@@ -179,7 +187,8 @@ void drawBoard(int lives,int score,int high,Ship& s, vector<Creep>& c, vector<Pr
 }
 
 //Check if object has collided with a projectile. If so, removes them both
-void checkCollisions(vector<Projectile>& p,vector<Creep>& c){
+int checkCollisions(vector<Projectile>& p,vector<Creep>& c){
+  int collisions = 0;
   //check each projectile against each creep
   for( int i=0; i<(int)p.size(); ++i ){
     for( int j=0; j<(int)c.size(); ++j ){
@@ -188,10 +197,11 @@ void checkCollisions(vector<Projectile>& p,vector<Creep>& c){
         c.erase( c.begin()+j );
         --i;
         --j;
+        ++collisions;
       }
     }
   }
-
+  return collisions;
 }
 
 bool checkDeath(vector<Projectile>& c, Ship& p){
