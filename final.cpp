@@ -56,10 +56,14 @@ int main(){
   int fireLag =0;
   bool fireReady = false;
   int creepWait=0;
+  int formV = 0; //Velocity of moving formation
+  int formA = 0; //acceleration (direction) for form movement
 
   Creep bug = createCreep(0,100, 20,20,"butterfly");
   for(int i=60; i<xMax-60; i+=60){
     bug = createCreep(i,100, 20,20,"butterfly");
+    enemies.insert(enemies.end(),bug);
+    bug = createCreep(i,200, 20,20,"butterfly");
     enemies.insert(enemies.end(),bug);
   }
   gfx_open(xMax,yMax,"GALAGA");
@@ -92,10 +96,14 @@ int main(){
         fireReady = true;
       }
     }
+    //Creep formation should spread and compress from current positions (see OG game)
+    if( formX < 3 )
+    ++formX;
+    ++formY;
+
     //timer to check random creep firing
     if( creepWait > 250){
       creepWait = random( 0,enemies.size() );
-      cout << "CREEP: " << creepWait << "\n";
       enemyProjs.insert(enemyProjs.end(), enemies[creepWait].fireProjectile());
       creepWait = 0;
     } else {
@@ -224,9 +232,7 @@ void saveHighScore( int score, string fname ){
 //RN-Gesus
 //Returns a random number between MIN and MAX
 int random(int min, int max){
-  cout << "MAX: " << max << "\nMIN: "<< min <<"\n";
   int ran = ( std::rand() % (max-min+1) ) + min;
-  cout << "RAND: " << ran << "\n";
   return ran;
 }
 
