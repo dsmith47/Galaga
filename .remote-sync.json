@@ -1,0 +1,15 @@
+{
+  "uploadOnSave": true,
+  "useAtomicWrites": false,
+  "deleteLocal": false,
+  "hostname": "student03.cse.nd.edu",
+  "target": "/afs/nd.edu/user7/dsmith47/Documents/FundComp/Labs/galaga",
+  "ignore": [
+    ".remote-sync.json",
+    ".git/**"
+  ],
+  "username": "dsmith47",
+  "password": "NotreDameStudentAcce55",
+  "watch": [],
+  "transport": "scp"
+}

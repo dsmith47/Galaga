@@ -1,17 +1,32 @@
 FINAL CODING PROJECT
-PAC-MAN CLONE
+GALAGA CLONE
 
 Douglas J. Smith
 
 Building:
     Compile to executable with:
-        make final
-        make pacman
+        make
+
 
 Gameplay:
-
+  Player controls a side-scrolling ship and fires weapons at patterns of creeps
+  Creeps move in simple patterns and randomly fire on the player
 
 Codebase:
+  Sprite Class: all items are regulated with this base class for moving
+  Moving Classes:
+    Ship (player)
+    Creep
+    projectile - two types for two directions
 
+Action is handled tick by tick, with a series of checks/updates by tick:
+  0. Check for command for player
+    Move left/right as required
+    fire as necessary
+  1. Move Projectiles
+  2. Check for projectile collisions
+  3. Modify score
+  4. Check for end of game
 
 Easter Eggs:
+  (H) Unleash-hail : fires a screen-sized line of projectiles to clear a board
